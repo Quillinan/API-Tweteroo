@@ -66,26 +66,47 @@ app.post('/tweets', (req, res) => {
   res.status(201).send('OK');
 });
 
-app.get('/tweets', (_, res) => {
+app.get('/tweets', (req, res) => {
   const formattedTweets = [];
 
-  if (tweets.length === 0) {
+  if (!req.query.page) {
+    if (tweets.length === 0) {
+      return res.json(formattedTweets);
+    }
+
+    const lastTweets = tweets.slice(-10);
+
+    lastTweets.forEach(({ username, tweet }) => {
+      const user = users.find((user) => user.username === username);
+      const formattedTweet = {
+        username,
+        avatar: user ? user.avatar : null,
+        tweet,
+      };
+      formattedTweets.push(formattedTweet);
+    });
+
     return res.json(formattedTweets);
   }
 
-  const lastTweets = tweets.slice(-10);
+  const limit = 10;
+  const page = parseInt(req.query.page);
 
-  lastTweets.forEach(({ username, tweet }) => {
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+
+  const tweetsPage = tweets.slice(startIndex, endIndex);
+
+  const formattedTweetsPage = tweetsPage.map(({ username, tweet }) => {
     const user = users.find((user) => user.username === username);
-    const formattedTweet = {
+    return {
       username,
       avatar: user ? user.avatar : null,
       tweet,
     };
-    formattedTweets.push(formattedTweet);
   });
 
-  res.json(formattedTweets);
+  res.json(formattedTweetsPage);
 });
 
 app.get('/tweets/:username', (req, res) => {
@@ -104,9 +125,10 @@ app.get('/tweets/:username', (req, res) => {
   res.status(200).json(formattedTweets);
 });
 
-app.get('/users', (_, res) => {
-  res.status(200).json(users);
-});
+// Apenas para testar as rotas
+// app.get('/users', (_, res) => {
+//   res.status(200).json(users);
+// });
 
 app.listen(5000, () => {
   console.log('Servidor rodando na porta 5000');
