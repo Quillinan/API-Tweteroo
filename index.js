@@ -1,5 +1,5 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
 const app = express();
 
 app.use(express.json());
@@ -15,10 +15,10 @@ function addUser(username, avatar) {
   };
 
   users.push(newUser);
-  return "OK";
+  return 'OK';
 }
 
-app.post("/sign-up", (req, res) => {
+app.post('/sign-up', (req, res) => {
   const { username, avatar } = req.body;
 
   const response = addUser(username, avatar);
@@ -26,11 +26,11 @@ app.post("/sign-up", (req, res) => {
   res.status(201).send(response);
 });
 
-app.post("/tweets", (req, res) => {
+app.post('/tweets', (req, res) => {
   const { username, tweet } = req.body;
 
-  if (!username) {
-    return res.status(401).send("UNAUTHORIZED");
+  if (!username || !users.includes(username)) {
+    return res.status(401).send('UNAUTHORIZED');
   }
 
   const newTweet = {
@@ -40,10 +40,10 @@ app.post("/tweets", (req, res) => {
 
   tweets.push(newTweet);
 
-  res.status(201).send("OK");
+  res.status(201).send('OK');
 });
 
-app.get("/tweets", (_, res) => {
+app.get('/tweets', (_, res) => {
   const formattedTweets = [];
 
   if (tweets.length === 0) {
@@ -66,6 +66,6 @@ app.get("/tweets", (_, res) => {
 });
 
 app.listen(5000, () => {
-  console.log("Servidor rodando na porta 5000");
-  ("Online");
+  console.log('Servidor rodando na porta 5000');
+  ('Online');
 });
