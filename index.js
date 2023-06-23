@@ -92,6 +92,10 @@ app.get('/tweets', (req, res) => {
   const limit = 10;
   const page = parseInt(req.query.page);
 
+  if (isNaN(page) || page < 1 || (page - 1) * limit >= tweets.length) {
+    return res.status(400).send('Bad Request');
+  }
+
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
 
